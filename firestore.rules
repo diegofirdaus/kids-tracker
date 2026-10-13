@@ -1,0 +1,17 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Anyone with the link can use the tracker, but only these three collections.
+    match /tasks/{id} {
+      allow read: if true;
+      allow write: if request.resource == null || request.resource.data.title is string;
+    }
+    match /checks/{id} {
+      allow read, write: if true;
+    }
+    match /settings/{id} {
+      allow read, write: if true;
+    }
+    // Everything else is locked.
+  }
+}

@@ -1,0 +1,389 @@
+<title>Danesh &amp; Zidane Daily</title>
+<!doctype html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="robots" content="noindex">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&family=Figtree:wght@400;500;600;700&display=swap">
+<style>
+/* Layout: one narrow column, phone-first. Header with mode + language switch, then the active mode's cards. */
+:root{
+  --bg:#f3f6fb; --surface:#ffffff; --ink:#1c2534; --muted:#5d6a80; --line:#dbe3ef;
+  --sky:#2f6fe4; --sky-soft:#e3ecfd; --sun:#ffb21e; --sun-soft:#fff2d6;
+  --good:#1f9d63; --good-soft:#dcf4e8; --warn:#c77700; --miss:#d1495b; --miss-soft:#fbe3e6;
+  --display:"Fredoka", "Trebuchet MS", system-ui, sans-serif;
+  --body:"Figtree", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --r:18px;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#111723; --surface:#1a2231; --ink:#eef2f8; --muted:#a1adc2; --line:#2c374b;
+  --sky:#6d9bff; --sky-soft:#1f2d4a; --sun:#ffc24d; --sun-soft:#3a2e14;
+  --good:#45c98b; --good-soft:#163428; --warn:#f0a53a; --miss:#f07585; --miss-soft:#3d1c23; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#111723; --surface:#1a2231; --ink:#eef2f8; --muted:#a1adc2; --line:#2c374b;
+  --sky:#6d9bff; --sky-soft:#1f2d4a; --sun:#ffc24d; --sun-soft:#3a2e14;
+  --good:#45c98b; --good-soft:#163428; --warn:#f0a53a; --miss:#f07585; --miss-soft:#3d1c23; color-scheme:dark}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--body);font-size:16px;line-height:1.45}
+.wrap{max-width:560px;margin:0 auto;padding-inline:16px;padding-block:14px 48px;display:flex;flex-direction:column;gap:16px}
+header{display:flex;align-items:center;justify-content:space-between;gap:12px}
+h1{font-family:var(--display);font-weight:700;font-size:1.45rem;margin:0;line-height:1.1;text-wrap:balance}
+.date{color:var(--muted);font-size:.9rem;margin-top:2px}
+.lang{display:flex;border:1.5px solid var(--line);border-radius:999px;overflow:hidden;flex-shrink:0}
+.lang button{border:0;background:transparent;color:var(--muted);font:600 .8rem var(--body);padding:6px 11px;cursor:pointer}
+.lang button[aria-pressed="true"]{background:var(--ink);color:var(--bg)}
+.seg{display:grid;grid-template-columns:1fr 1fr;gap:6px;background:var(--surface);border:1px solid var(--line);border-radius:999px;padding:5px}
+.seg button{border:0;border-radius:999px;padding:10px;font:600 .95rem var(--body);background:transparent;color:var(--muted);cursor:pointer}
+.seg button[aria-pressed="true"]{background:var(--sky);color:#fff}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:18px;display:flex;flex-direction:column;gap:14px}
+h2{font-family:var(--display);font-weight:600;font-size:1.15rem;margin:0}
+.label{font-size:.75rem;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);font-weight:700}
+button:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid var(--sun);outline-offset:2px}
+/* kid picker */
+.kids{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.kid{border:2px solid var(--line);background:var(--surface);color:var(--ink);border-radius:var(--r);padding:12px;display:flex;align-items:center;gap:10px;cursor:pointer;text-align:left;font:inherit}
+.kid[aria-pressed="true"]{border-color:var(--sky);background:var(--sky-soft)}
+.avatar{width:40px;height:40px;border-radius:50%;display:grid;place-items:center;font:700 1.1rem var(--display);color:#fff;flex-shrink:0}
+.av-danesh{background:#2f6fe4}.av-zidane{background:#e0662f}
+.kid b{font-family:var(--display);font-weight:600;font-size:1.05rem;display:block}
+.kid small{color:var(--muted);font-size:.8rem}
+/* progress */
+.prog{display:flex;align-items:center;gap:14px}
+.ring{width:64px;height:64px;flex-shrink:0}
+.ring circle{fill:none;stroke-width:8}
+.ring .bgc{stroke:var(--line)}.ring .fg{stroke:var(--good);stroke-linecap:round;transition:stroke-dashoffset .5s}
+.ring text{fill:var(--ink);font:700 15px var(--display)}
+.big{font-family:var(--display);font-size:1.25rem;font-weight:600}
+/* checklist */
+.list{display:flex;flex-direction:column;gap:8px;list-style:none;margin:0;padding:0}
+.item{display:flex;align-items:center;gap:12px;border:1.5px solid var(--line);border-radius:14px;padding:12px 14px;cursor:pointer;background:var(--surface);color:var(--ink);font:500 1.02rem var(--body);text-align:left;width:100%}
+.item .box{width:30px;height:30px;border-radius:9px;border:2.5px solid var(--muted);display:grid;place-items:center;flex-shrink:0;transition:.15s}
+.item[aria-checked="true"]{background:var(--good-soft);border-color:var(--good)}
+.item[aria-checked="true"] .box{background:var(--good);border-color:var(--good)}
+.item[aria-checked="true"] .t{text-decoration:line-through;color:var(--muted)}
+.item svg{width:18px;height:18px;stroke:#fff;stroke-width:3.5;fill:none;opacity:0}
+.item[aria-checked="true"] svg{opacity:1}
+.item .t{flex:1;min-width:0;overflow-wrap:anywhere}
+.yay{background:var(--sun-soft);border-radius:14px;padding:12px 14px;font-weight:600;text-align:center}
+/* week strip */
+.week{display:grid;grid-template-columns:repeat(7,1fr);gap:6px}
+.day{display:flex;flex-direction:column;align-items:center;gap:4px;font-size:.72rem;color:var(--muted);font-weight:600}
+.dot{width:100%;max-width:38px;aspect-ratio:1;border-radius:10px;display:grid;place-items:center;font:700 .8rem var(--display);border:1.5px solid var(--line);color:var(--muted)}
+.dot.full{background:var(--good);border-color:var(--good);color:#fff}
+.dot.free{background:var(--good-soft);border-color:var(--good);color:var(--good)}
+.dot.part{background:var(--sun-soft);border-color:var(--sun);color:var(--warn)}
+.dot.miss{background:var(--miss-soft);border-color:var(--miss);color:var(--miss)}
+.dot.today{outline:2.5px solid var(--sky);outline-offset:2px}
+.reward{display:flex;align-items:center;gap:12px;background:var(--sun-soft);border-radius:14px;padding:12px 14px}
+.coin{width:42px;height:42px;border-radius:50%;background:var(--sun);display:grid;place-items:center;font:700 .78rem var(--display);color:#3b2a00;flex-shrink:0}
+.reward p{margin:0;font-size:.92rem}
+.reward b{font-family:var(--display);font-size:1.05rem}
+.pill{display:inline-block;font-size:.75rem;font-weight:700;padding:3px 9px;border-radius:999px}
+.pill.ok{background:var(--good-soft);color:var(--good)}.pill.bad{background:var(--miss-soft);color:var(--miss)}.pill.mid{background:var(--sky-soft);color:var(--sky)}
+/* forms */
+.field{display:flex;flex-direction:column;gap:6px}
+.field label{font-weight:600;font-size:.9rem}
+input,select{font:inherit;color:var(--ink);background:var(--bg);border:1.5px solid var(--line);border-radius:12px;padding:11px 12px;width:100%;box-sizing:border-box}
+.row{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+@media (max-width:380px){.row{grid-template-columns:1fr}}
+.btn{border:0;border-radius:12px;padding:12px 16px;font:700 1rem var(--body);background:var(--sky);color:#fff;cursor:pointer}
+.btn.ghost{background:transparent;color:var(--sky);border:1.5px solid var(--sky)}
+.btn.small{padding:7px 12px;font-size:.85rem}
+.tasks{display:flex;flex-direction:column;gap:6px;list-style:none;margin:0;padding:0}
+.task{display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid var(--line)}
+.task:last-child{border-bottom:0}
+.task .t{flex:1;min-width:0;overflow-wrap:anywhere}
+.task small{color:var(--muted);display:block;font-size:.8rem}
+.del{border:1.5px solid var(--line);background:transparent;color:var(--miss);border-radius:10px;padding:6px 10px;font:600 .8rem var(--body);cursor:pointer}
+.del.confirm{background:var(--miss);color:#fff;border-color:var(--miss)}
+.rep{display:flex;flex-direction:column;gap:10px}
+.rephead{display:flex;align-items:center;gap:10px;justify-content:space-between;flex-wrap:wrap}
+.muted{color:var(--muted);font-size:.9rem;margin:0}
+.empty{border:1.5px dashed var(--line);border-radius:14px;padding:18px;text-align:center;color:var(--muted)}
+.pin{display:flex;gap:10px}
+.pin input{letter-spacing:.4em;font-size:1.3rem;text-align:center}
+.err{color:var(--miss);font-size:.88rem;font-weight:600;margin:0}
+.toast{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(18px + env(safe-area-inset-bottom,0px));background:var(--ink);color:var(--bg);padding:10px 16px;border-radius:12px;font-weight:600;font-size:.9rem;max-width:calc(100% - 32px)}
+.legend{display:flex;flex-wrap:wrap;gap:10px;font-size:.78rem;color:var(--muted)}
+.legend span{display:flex;align-items:center;gap:5px}
+.legend i{width:12px;height:12px;border-radius:4px;display:inline-block;border:1.5px solid var(--line)}
+canvas#fx{position:fixed;inset:0;pointer-events:none;width:100%;height:100%}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+</head>
+<body>
+
+<div class="wrap">
+  <header>
+    <div>
+      <h1 id="hTitle">Danesh &amp; Zidane</h1>
+      <div class="date" id="hDate"></div>
+    </div>
+    <div class="lang" role="group" aria-label="Language">
+      <button id="lang-en" aria-pressed="false">EN</button>
+      <button id="lang-id" aria-pressed="true">ID</button>
+    </div>
+  </header>
+
+  <div class="seg" role="group">
+    <button id="mode-kid" aria-pressed="true"></button>
+    <button id="mode-parent" aria-pressed="false"></button>
+  </div>
+
+  <p class="muted" id="status" hidden></p>
+  <main id="view" style="display:flex;flex-direction:column;gap:16px"></main>
+</div>
+<canvas id="fx" hidden></canvas>
+<div class="toast" id="toast" hidden></div>
+
+<script>
+const KIDS=[{id:'danesh',name:'Danesh'},{id:'zidane',name:'Zidane'}];
+const T={
+ en:{kidMode:'Kid mode',parentMode:'Parent mode',today:'Today',tasksDone:(a,b)=>`${a} of ${b} done`,noTasks:'No tasks today. Enjoy your free day!',
+  allDone:'All done today! Great job! 🎉',tapToCheck:'Tap a task when you finish it',thisWeek:'This week',
+  rewardOnTrack:(r)=>`Finish every day this week to get ${r} on Sunday`,rewardEarned:(r)=>`You earned ${r} this week!`,rewardMissed:(r)=>`A day was missed this week. New chance from Monday for ${r}.`,
+  enterPin:'Enter parent PIN',unlock:'Unlock',wrongPin:'Wrong PIN. Try again.',pinHint:'Default PIN is 1234. Change it in Settings below.',
+  addTask:'Add a task',taskName:'Task',taskPh:'e.g. Read 15 minutes',forWho:'For',both:'Both',repeat:'Repeats',
+  daily:'Every day',school:'School days (Mon–Fri)',once:'Just once',onDate:'Date',add:'Add task',added:'Task added',
+  allTasks:'Task list',remove:'Remove',sure:'Sure?',removed:'Task removed',noTaskYet:'No tasks yet. Add the first one above.',
+  report:'Report',last7:'Last 7 days',weekReward:'Weekly reward',earned:'Earned',onTrack:'On track',missed:'Missed',
+  settings:'Settings',newPin:'New PIN (4 digits)',reward:'Weekly reward (Rp)',save:'Save',saved:'Saved',lock:'Lock parent mode',
+  legFull:'All done',legPart:'Partly',legMiss:'Missed',legFree:'No tasks',
+  readOnly:'You can view this page but not save changes. Ask Diego for edit access.',noDb:'Not connected to the database yet.',
+  saveErr:'Could not save. Check your connection and try again.',days:['Mon','Tue','Wed','Thu','Fri','Sat','Sun']},
+ id:{kidMode:'Mode Anak',parentMode:'Mode Orang Tua',today:'Hari ini',tasksDone:(a,b)=>`${a} dari ${b} selesai`,noTasks:'Tidak ada tugas hari ini. Selamat libur!',
+  allDone:'Semua tugas selesai! Hebat! 🎉',tapToCheck:'Ketuk tugas kalau sudah selesai',thisWeek:'Minggu ini',
+  rewardOnTrack:(r)=>`Selesaikan semua tugas tiap hari minggu ini, dapat ${r} hari Minggu`,rewardEarned:(r)=>`Kamu dapat ${r} minggu ini!`,rewardMissed:(r)=>`Ada hari yang terlewat. Coba lagi mulai Senin untuk ${r}.`,
+  enterPin:'Masukkan PIN orang tua',unlock:'Buka',wrongPin:'PIN salah. Coba lagi.',pinHint:'PIN awal 1234. Ganti di Pengaturan di bawah.',
+  addTask:'Tambah tugas',taskName:'Tugas',taskPh:'mis. Baca buku 15 menit',forWho:'Untuk',both:'Keduanya',repeat:'Ulangi',
+  daily:'Setiap hari',school:'Hari sekolah (Sen–Jum)',once:'Sekali saja',onDate:'Tanggal',add:'Tambah tugas',added:'Tugas ditambahkan',
+  allTasks:'Daftar tugas',remove:'Hapus',sure:'Yakin?',removed:'Tugas dihapus',noTaskYet:'Belum ada tugas. Tambahkan tugas pertama di atas.',
+  report:'Laporan',last7:'7 hari terakhir',weekReward:'Hadiah mingguan',earned:'Dapat',onTrack:'Masih bisa',missed:'Terlewat',
+  settings:'Pengaturan',newPin:'PIN baru (4 angka)',reward:'Hadiah mingguan (Rp)',save:'Simpan',saved:'Tersimpan',lock:'Kunci mode orang tua',
+  legFull:'Selesai semua',legPart:'Sebagian',legMiss:'Terlewat',legFree:'Tanpa tugas',
+  readOnly:'Kamu bisa melihat halaman ini tapi tidak bisa menyimpan. Minta akses edit ke Diego.',noDb:'Belum terhubung ke database.',
+  saveErr:'Gagal menyimpan. Cek koneksi lalu coba lagi.',days:['Sen','Sel','Rab','Kam','Jum','Sab','Min']}
+};
+const S={lang:'id',mode:'kid',kid:'danesh',unlocked:false,tasks:[],checks:{},settings:{pin:'1234',reward:10000},db:null,readOnly:false,pendingDel:null};
+try{const l=localStorage.getItem('lang');if(l==='en'||l==='id')S.lang=l;const k=localStorage.getItem('kid');if(k)S.kid=k}catch(e){}
+const t=()=>T[S.lang];
+const $=id=>document.getElementById(id);
+const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const pad=n=>String(n).padStart(2,'0');
+const ymd=d=>`${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`;
+const addDays=(d,n)=>{const x=new Date(d);x.setDate(x.getDate()+n);return x};
+const parse=s=>{const[a,b,c]=s.split('-').map(Number);return new Date(a,b-1,c)};
+const dowIdx=s=>(parse(s).getDay()+6)%7; // Mon=0
+const todayStr=()=>ymd(new Date());
+const rp=n=>'Rp'+Number(n||0).toLocaleString('id-ID');
+
+function tasksFor(kid,date){
+  return S.tasks.filter(x=>{
+    if(!(x.kid===kid||x.kid==='both'))return false;
+    if(x.created && date<x.created)return false;
+    if(x.archived && date>=x.archived)return false;
+    if(x.repeat==='daily')return true;
+    if(x.repeat==='school')return dowIdx(date)<5;
+    if(x.repeat==='once')return x.date===date;
+    return false;
+  }).sort((a,b)=>(a.createdAt||0)-(b.createdAt||0));
+}
+function doneMap(kid,date){return (S.checks[date+'_'+kid]||{}).done||{}}
+function dayStatus(kid,date){
+  const list=tasksFor(kid,date),dm=doneMap(kid,date);
+  const done=list.filter(x=>dm[x.id]).length;
+  const today=todayStr();
+  let st;
+  if(date>today)st='future';
+  else if(!list.length)st='free';
+  else if(done===list.length)st='full';
+  else if(date===today)st=done?'part':'open';
+  else st=done?'part':'miss';
+  return {list,done,total:list.length,st};
+}
+function weekInfo(kid){
+  const today=todayStr(),mon=addDays(parse(today),-dowIdx(today));
+  const days=[...Array(7)].map((_,i)=>{const d=ymd(addDays(mon,i));return {date:d,...dayStatus(kid,d)}});
+  const broken=days.some(d=>d.date<today&&!(d.st==='full'||d.st==='free'));
+  const allOk=days.every(d=>d.st==='full'||d.st==='free');
+  return {days,state:allOk?'earned':broken?'missed':'track'};
+}
+
+function ring(done,total){
+  const r=26,c=2*Math.PI*r,p=total?done/total:1;
+  return `<svg class="ring" viewBox="0 0 64 64" aria-hidden="true"><circle class="bgc" cx="32" cy="32" r="${r}"/><circle class="fg" cx="32" cy="32" r="${r}" stroke-dasharray="${c}" stroke-dashoffset="${c*(1-p)}" transform="rotate(-90 32 32)"/><text x="32" y="37" text-anchor="middle">${total?Math.round(p*100)+'%':'—'}</text></svg>`;
+}
+function weekStrip(days){
+  const today=todayStr();
+  return `<div class="week">${days.map((d,i)=>{
+    const cls={full:'full',free:'free',part:'part',miss:'miss'}[d.st]||'';
+    const mark=d.st==='full'?'✓':d.st==='miss'?'✕':parse(d.date).getDate();
+    return `<div class="day"><div class="dot ${cls} ${d.date===today?'today':''}">${mark}</div>${t().days[i]}</div>`}).join('')}</div>`;
+}
+function legend(){return `<div class="legend"><span><i style="background:var(--good);border-color:var(--good)"></i>${t().legFull}</span><span><i style="background:var(--sun-soft);border-color:var(--sun)"></i>${t().legPart}</span><span><i style="background:var(--miss-soft);border-color:var(--miss)"></i>${t().legMiss}</span><span><i style="background:var(--good-soft);border-color:var(--good)"></i>${t().legFree}</span></div>`}
+
+function renderKid(){
+  const today=todayStr(),{list,done,total}=dayStatus(S.kid,today),dm=doneMap(S.kid,today),w=weekInfo(S.kid),r=rp(S.settings.reward);
+  const kidBtns=KIDS.map(k=>{const s=dayStatus(k.id,today);return `<button class="kid" data-kid="${k.id}" aria-pressed="${S.kid===k.id}"><span class="avatar av-${k.id}">${k.name[0]}</span><span><b>${k.name}</b><small>${t().tasksDone(s.done,s.total)}</small></span></button>`}).join('');
+  const items=list.length?`<ul class="list">${list.map(x=>`<li><button class="item" data-task="${x.id}" role="checkbox" aria-checked="${!!dm[x.id]}" ${S.readOnly||!S.db?'disabled':''}><span class="box"><svg viewBox="0 0 24 24"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg></span><span class="t">${esc(x.title)}</span></button></li>`).join('')}</ul>`:`<div class="empty">${t().noTasks}</div>`;
+  const rw=w.state==='earned'?t().rewardEarned(r):w.state==='missed'?t().rewardMissed(r):t().rewardOnTrack(r);
+  return `<div class="kids">${kidBtns}</div>
+  <section class="card">
+    <div class="prog">${ring(done,total)}<div><div class="label">${t().today}</div><div class="big">${total?t().tasksDone(done,total):t().noTasks}</div>${total&&done<total?`<p class="muted">${t().tapToCheck}</p>`:''}</div></div>
+    ${total&&done===total?`<div class="yay">${t().allDone}</div>`:''}
+    ${items}
+  </section>
+  <section class="card">
+    <div class="label">${t().thisWeek}</div>
+    ${weekStrip(w.days)}
+    <div class="reward"><span class="coin">10K</span><p><b>${rw}</b></p></div>
+  </section>`;
+}
+
+function renderPin(){
+  return `<section class="card"><h2>${t().enterPin}</h2>
+  <form id="pinForm" class="pin"><input id="pinInput" type="password" inputmode="numeric" maxlength="4" autocomplete="off" aria-label="PIN"><button class="btn" type="submit">${t().unlock}</button></form>
+  <p class="err" id="pinErr" hidden>${t().wrongPin}</p><p class="muted">${t().pinHint}</p></section>`;
+}
+function renderParent(){
+  if(!S.unlocked)return renderPin();
+  const today=todayStr(),ro=S.readOnly||!S.db;
+  const kidName=k=>k==='both'?t().both:KIDS.find(x=>x.id===k).name;
+  const rep=x=>x.repeat==='daily'?t().daily:x.repeat==='school'?t().school:`${t().once} · ${x.date}`;
+  const active=S.tasks.filter(x=>!x.archived||x.archived>today).filter(x=>x.repeat!=='once'||x.date>=today).sort((a,b)=>(a.createdAt||0)-(b.createdAt||0));
+  const reports=KIDS.map(k=>{
+    const days=[...Array(7)].map((_,i)=>{const d=ymd(addDays(new Date(),i-6));return {date:d,...dayStatus(k.id,d)}});
+    const s=dayStatus(k.id,today),w=weekInfo(k.id);
+    const pill=w.state==='earned'?`<span class="pill ok">${t().earned} ${rp(S.settings.reward)}</span>`:w.state==='missed'?`<span class="pill bad">${t().missed}</span>`:`<span class="pill mid">${t().onTrack}</span>`;
+    const strip=`<div class="week">${days.map(d=>{const cls={full:'full',free:'free',part:'part',miss:'miss'}[d.st]||'';const mark=d.total?`${d.done}/${d.total}`:'–';return `<div class="day"><div class="dot ${cls} ${d.date===today?'today':''}">${mark}</div>${t().days[dowIdx(d.date)]}</div>`}).join('')}</div>`;
+    return `<div class="rep"><div class="rephead"><div style="display:flex;align-items:center;gap:10px"><span class="avatar av-${k.id}">${k.name[0]}</span><div><b>${k.name}</b><div class="muted">${t().today}: ${s.total?t().tasksDone(s.done,s.total):'–'}</div></div></div>${pill}</div>${strip}</div>`;
+  }).join('<hr style="border:0;border-top:1px solid var(--line);margin:4px 0">');
+  return `<section class="card"><h2>${t().report}</h2><div class="label">${t().last7} · ${t().weekReward}</div>${reports}${legend()}</section>
+  <section class="card"><h2>${t().addTask}</h2>
+   <form id="addForm" style="display:flex;flex-direction:column;gap:12px">
+    <div class="field"><label for="fTitle">${t().taskName}</label><input id="fTitle" required maxlength="80" placeholder="${t().taskPh}" ${ro?'disabled':''}></div>
+    <div class="row">
+     <div class="field"><label for="fKid">${t().forWho}</label><select id="fKid" ${ro?'disabled':''}><option value="both">${t().both}</option><option value="danesh">Danesh</option><option value="zidane">Zidane</option></select></div>
+     <div class="field"><label for="fRepeat">${t().repeat}</label><select id="fRepeat" ${ro?'disabled':''}><option value="daily">${t().daily}</option><option value="school">${t().school}</option><option value="once">${t().once}</option></select></div>
+    </div>
+    <div class="field" id="dateField" hidden><label for="fDate">${t().onDate}</label><input id="fDate" type="date" value="${today}" min="${today}"></div>
+    <button class="btn" type="submit" ${ro?'disabled':''}>${t().add}</button>
+   </form></section>
+  <section class="card"><h2>${t().allTasks}</h2>
+   ${active.length?`<ul class="tasks">${active.map(x=>`<li class="task"><span class="t">${esc(x.title)}<small>${kidName(x.kid)} · ${rep(x)}</small></span><button class="del ${S.pendingDel===x.id?'confirm':''}" data-del="${x.id}" ${ro?'disabled':''}>${S.pendingDel===x.id?t().sure:t().remove}</button></li>`).join('')}</ul>`:`<div class="empty">${t().noTaskYet}</div>`}
+  </section>
+  <section class="card"><h2>${t().settings}</h2>
+   <form id="setForm" style="display:flex;flex-direction:column;gap:12px">
+    <div class="row">
+     <div class="field"><label for="sPin">${t().newPin}</label><input id="sPin" inputmode="numeric" maxlength="4" pattern="[0-9]{4}" value="${esc(S.settings.pin)}" ${ro?'disabled':''}></div>
+     <div class="field"><label for="sReward">${t().reward}</label><input id="sReward" type="number" min="0" step="1000" value="${Number(S.settings.reward)||0}" ${ro?'disabled':''}></div>
+    </div>
+    <button class="btn" type="submit" ${ro?'disabled':''}>${t().save}</button>
+   </form>
+   <button class="btn ghost small" id="lockBtn" type="button">${t().lock}</button>
+  </section>`;
+}
+
+function render(){
+  document.documentElement.lang=S.lang;
+  $('lang-en').setAttribute('aria-pressed',S.lang==='en');$('lang-id').setAttribute('aria-pressed',S.lang==='id');
+  $('mode-kid').textContent=t().kidMode;$('mode-parent').textContent=t().parentMode;
+  $('mode-kid').setAttribute('aria-pressed',S.mode==='kid');$('mode-parent').setAttribute('aria-pressed',S.mode==='parent');
+  $('hDate').textContent=new Date().toLocaleDateString(S.lang==='id'?'id-ID':'en-GB',{weekday:'long',day:'numeric',month:'long'});
+  const st=$('status');
+  if(!S.db){st.hidden=false;st.textContent=t().noDb}else if(S.readOnly){st.hidden=false;st.textContent=t().readOnly}else st.hidden=true;
+  // keep what a parent is typing when live data refreshes the page
+  const keep={},focusId=document.activeElement&&document.activeElement.id;
+  document.querySelectorAll('#view input, #view select').forEach(el=>{if(el.id)keep[el.id]=el.value});
+  const prevMode=render._mode;render._mode=S.mode+S.unlocked;
+  $('view').innerHTML=S.mode==='kid'?renderKid():renderParent();
+  if(prevMode===render._mode){for(const id in keep){const el=$(id);if(el)el.value=keep[id]}
+    if($('fRepeat')&&$('dateField'))$('dateField').hidden=$('fRepeat').value!=='once';
+    if(focusId&&$(focusId))try{$(focusId).focus()}catch(e){}}
+  bind();
+}
+function toast(msg){const el=$('toast');el.textContent=msg;el.hidden=false;clearTimeout(toast._t);toast._t=setTimeout(()=>el.hidden=true,2200)}
+
+// one write at a time per document
+const queues={};
+function write(path,fn){queues[path]=(queues[path]||Promise.resolve()).then(fn).catch(e=>{console.error(e);toast(t().saveErr)});return queues[path]}
+
+function bind(){
+  document.querySelectorAll('[data-kid]').forEach(b=>b.onclick=()=>{S.kid=b.dataset.kid;try{localStorage.setItem('kid',S.kid)}catch(e){}render()});
+  document.querySelectorAll('[data-task]').forEach(b=>b.onclick=()=>{
+    const today=todayStr(),key=today+'_'+S.kid,id=b.dataset.task;
+    const before=dayStatus(S.kid,today);
+    const dm={...doneMap(S.kid,today)};if(dm[id])delete dm[id];else dm[id]=true;
+    S.checks[key]={date:today,kid:S.kid,done:dm};
+    render();
+    const after=dayStatus(S.kid,today);
+    if(after.total&&after.done===after.total&&before.done<before.total)confetti();
+    write('checks/'+key,()=>S.db.doc('checks/'+key).set({date:today,kid:S.kid,done:dm,updatedAt:Date.now()}));
+  });
+  const pf=$('pinForm');
+  if(pf){pf.onsubmit=e=>{e.preventDefault();if($('pinInput').value===String(S.settings.pin||'1234')){S.unlocked=true;render()}else{$('pinErr').hidden=false;$('pinInput').value=''}};setTimeout(()=>{try{$('pinInput').focus()}catch(e){}},50)}
+  const af=$('addForm');
+  if(af){
+    $('fRepeat').onchange=()=>{$('dateField').hidden=$('fRepeat').value!=='once'};
+    af.onsubmit=e=>{e.preventDefault();const title=$('fTitle').value.trim();if(!title||!S.db)return;
+      const repeat=$('fRepeat').value,ref=S.db.collection('tasks').doc();
+      const doc={title,kid:$('fKid').value,repeat,date:repeat==='once'?($('fDate').value||todayStr()):null,created:repeat==='once'?($('fDate').value<todayStr()?$('fDate').value:todayStr()):todayStr(),createdAt:Date.now(),archived:null};
+      write('tasks/'+ref.id,()=>ref.set(doc).then(()=>toast(t().added)));
+      S.tasks.push({id:ref.id,...doc});$('fTitle').value='';render()};
+  }
+  document.querySelectorAll('[data-del]').forEach(b=>b.onclick=()=>{
+    const id=b.dataset.del;
+    if(S.pendingDel!==id){S.pendingDel=id;render();return}
+    S.pendingDel=null;const today=todayStr();const x=S.tasks.find(v=>v.id===id);if(x)x.archived=today;render();
+    write('tasks/'+id,()=>S.db.doc('tasks/'+id).update({archived:today}).then(()=>toast(t().removed)));
+  });
+  const sf=$('setForm');
+  if(sf)sf.onsubmit=e=>{e.preventDefault();const pin=$('sPin').value.trim(),reward=Math.max(0,parseInt($('sReward').value,10)||0);
+    if(!/^\d{4}$/.test(pin)){toast(t().newPin);return}
+    S.settings={pin,reward};render();write('settings/main',()=>S.db.doc('settings/main').set({pin,reward}).then(()=>toast(t().saved)))};
+  const lb=$('lockBtn');if(lb)lb.onclick=()=>{S.unlocked=false;S.mode='kid';render()};
+}
+$('lang-en').onclick=()=>{S.lang='en';try{localStorage.setItem('lang','en')}catch(e){}render()};
+$('lang-id').onclick=()=>{S.lang='id';try{localStorage.setItem('lang','id')}catch(e){}render()};
+$('mode-kid').onclick=()=>{S.mode='kid';render()};
+$('mode-parent').onclick=()=>{S.mode='parent';render()};
+
+// confetti
+function confetti(){
+  if(matchMedia('(prefers-reduced-motion: reduce)').matches)return;
+  const c=$('fx'),x=c.getContext('2d');c.hidden=false;c.width=innerWidth;c.height=innerHeight;
+  const cols=['#2f6fe4','#ffb21e','#1f9d63','#e0662f','#d1495b'];
+  const ps=[...Array(120)].map(()=>({x:c.width/2,y:c.height/3,vx:(Math.random()-.5)*12,vy:Math.random()*-12-3,s:Math.random()*7+4,c:cols[Math.floor(Math.random()*5)],r:Math.random()*6}));
+  let f=0;(function step(){x.clearRect(0,0,c.width,c.height);ps.forEach(p=>{p.vy+=.35;p.x+=p.vx;p.y+=p.vy;p.r+=.1;x.save();x.translate(p.x,p.y);x.rotate(p.r);x.fillStyle=p.c;x.fillRect(-p.s/2,-p.s/2,p.s,p.s*.6);x.restore()});
+    if(++f<110)requestAnimationFrame(step);else{x.clearRect(0,0,c.width,c.height);c.hidden=true}})();
+}
+
+render();
+
+// data: Firebase Firestore (shared by everyone who has the link)
+const firebaseConfig = {
+  apiKey: "AIzaSyAsQZTUavd4TCDnMvuUvhrS9kuBMBvpsBw",
+  authDomain: "kids-tracker-9ea88.firebaseapp.com",
+  projectId: "kids-tracker-9ea88",
+  storageBucket: "kids-tracker-9ea88.firebasestorage.app",
+  messagingSenderId: "439490860277",
+  appId: "1:439490860277:web:2e8982ac6d10d68c6a21bc"
+};
+(async()=>{
+  if(!window.firebase||!firebaseConfig.projectId)return;
+  firebase.initializeApp(firebaseConfig);
+  const db=firebase.firestore();
+  S.db=db;
+  render();
+  db.collection('tasks').onSnapshot(s=>{S.tasks=s.docs.map(d=>({id:d.id,...d.data()}));render()},()=>{});
+  const since=ymd(addDays(new Date(),-14));
+  db.collection('checks').where('date','>=',since).onSnapshot(s=>{const m={};s.docs.forEach(d=>m[d.id]=d.data());S.checks=m;render()},()=>{});
+  db.doc('settings/main').onSnapshot(s=>{if(s.exists){const d=s.data();S.settings={pin:String(d.pin||'1234'),reward:Number(d.reward)||0};render()}},()=>{});
+})();
+</script>
+
+</body>
+</html>
