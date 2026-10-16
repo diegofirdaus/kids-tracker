@@ -1,8 +1,8 @@
-<title>Danesh &amp; Zidane Daily</title>
 <!doctype html>
 <html lang="id">
 <head>
 <meta charset="utf-8">
+<title>Danesh &amp; Zidane Daily</title>
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="robots" content="noindex">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -108,8 +108,28 @@ input,select{font:inherit;color:var(--ink);background:var(--bg);border:1.5px sol
 .legend{display:flex;flex-wrap:wrap;gap:10px;font-size:.78rem;color:var(--muted)}
 .legend span{display:flex;align-items:center;gap:5px}
 .legend i{width:12px;height:12px;border-radius:4px;display:inline-block;border:1.5px solid var(--line)}
-canvas#fx{position:fixed;inset:0;pointer-events:none;width:100%;height:100%}
-@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+canvas#fx{position:fixed;inset:0;pointer-events:none;width:100%;height:100%;z-index:30}
+/* celebrations: per-task pop + stars + cheer word, all-done party card */
+.item.pop{animation:glow .7s ease-out}
+.item.pop .box{animation:pop .5s cubic-bezier(.3,1.6,.5,1)}
+@keyframes pop{0%{transform:scale(.5)}55%{transform:scale(1.3) rotate(-8deg)}100%{transform:scale(1)}}
+@keyframes glow{0%{box-shadow:0 0 0 0 rgba(31,157,99,.5)}100%{box-shadow:0 0 0 14px rgba(31,157,99,0)}}
+.spark{position:fixed;pointer-events:none;z-index:20;font-size:20px;line-height:1;animation:fly .8s ease-out forwards}
+@keyframes fly{0%{transform:translate(-50%,-50%) scale(.3);opacity:1}100%{transform:translate(calc(-50% + var(--dx)),calc(-50% + var(--dy))) scale(1.1) rotate(160deg);opacity:0}}
+.cheer{position:fixed;pointer-events:none;z-index:20;font:700 1.35rem var(--display);color:var(--good);white-space:nowrap;text-shadow:0 2px 0 var(--surface);animation:rise 1.1s ease-out forwards}
+@keyframes rise{0%{transform:translate(-50%,0) scale(.5);opacity:0}20%{transform:translate(-50%,-10px) scale(1.15);opacity:1}100%{transform:translate(-50%,-70px) scale(1);opacity:0}}
+.ring.full{animation:beat .6s ease-in-out 2}
+@keyframes beat{50%{transform:scale(1.15)}}
+.yay{animation:pop .5s cubic-bezier(.3,1.6,.5,1)}
+.party{position:fixed;inset:0;z-index:25;display:grid;place-items:center;padding:16px;background:rgba(10,15,25,.45)}
+.party[hidden]{display:none}
+.party-card{background:var(--surface);color:var(--ink);border-radius:24px;padding:28px 22px;text-align:center;width:100%;max-width:320px;box-sizing:border-box;display:flex;flex-direction:column;gap:10px;align-items:center;animation:zoom .55s cubic-bezier(.3,1.5,.5,1)}
+.party-card .trophy{font-size:76px;line-height:1;animation:bounce 1.1s ease-in-out infinite}
+.party-card h2{font-size:1.5rem}
+.party-card p{margin:0;color:var(--muted)}
+@keyframes zoom{0%{transform:scale(.4);opacity:0}100%{transform:scale(1);opacity:1}}
+@keyframes bounce{0%,100%{transform:translateY(0) rotate(-6deg)}50%{transform:translateY(-14px) rotate(6deg)}}
+@media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
 </style>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
@@ -137,6 +157,7 @@ canvas#fx{position:fixed;inset:0;pointer-events:none;width:100%;height:100%}
   <main id="view" style="display:flex;flex-direction:column;gap:16px"></main>
 </div>
 <canvas id="fx" hidden></canvas>
+<div class="party" id="party" hidden><div class="party-card" role="dialog" aria-modal="true" aria-labelledby="partyTitle"><div class="trophy" aria-hidden="true">🏆</div><h2 id="partyTitle"></h2><p id="partyText"></p><button class="btn" id="partyBtn"></button></div></div>
 <div class="toast" id="toast" hidden></div>
 
 <script>
@@ -153,7 +174,8 @@ const T={
   settings:'Settings',newPin:'New PIN (4 digits)',reward:'Weekly reward (Rp)',save:'Save',saved:'Saved',lock:'Lock parent mode',
   legFull:'All done',legPart:'Partly',legMiss:'Missed',legFree:'No tasks',
   readOnly:'You can view this page but not save changes. Ask Diego for edit access.',noDb:'Not connected to the database yet.',
-  saveErr:'Could not save. Check your connection and try again.',days:['Mon','Tue','Wed','Thu','Fri','Sat','Sun']},
+  saveErr:'Could not save. Check your connection and try again.',cheers:['Nice!','Awesome!','Super!','Keep going!','Great job!','Boom! 💥'],
+  partyTitle:(n)=>`Way to go, ${n}!`,partyText:'Every task is done today. See you tomorrow!',partyBtn:'Yay! 🎉',days:['Mon','Tue','Wed','Thu','Fri','Sat','Sun']},
  id:{kidMode:'Mode Anak',parentMode:'Mode Orang Tua',today:'Hari ini',tasksDone:(a,b)=>`${a} dari ${b} selesai`,noTasks:'Tidak ada tugas hari ini. Selamat libur!',
   allDone:'Semua tugas selesai! Hebat! 🎉',tapToCheck:'Ketuk tugas kalau sudah selesai',thisWeek:'Minggu ini',
   rewardOnTrack:(r)=>`Selesaikan semua tugas tiap hari minggu ini, dapat ${r} hari Minggu`,rewardEarned:(r)=>`Kamu dapat ${r} minggu ini!`,rewardMissed:(r)=>`Ada hari yang terlewat. Coba lagi mulai Senin untuk ${r}.`,
@@ -165,7 +187,8 @@ const T={
   settings:'Pengaturan',newPin:'PIN baru (4 angka)',reward:'Hadiah mingguan (Rp)',save:'Simpan',saved:'Tersimpan',lock:'Kunci mode orang tua',
   legFull:'Selesai semua',legPart:'Sebagian',legMiss:'Terlewat',legFree:'Tanpa tugas',
   readOnly:'Kamu bisa melihat halaman ini tapi tidak bisa menyimpan. Minta akses edit ke Diego.',noDb:'Belum terhubung ke database.',
-  saveErr:'Gagal menyimpan. Cek koneksi lalu coba lagi.',days:['Sen','Sel','Rab','Kam','Jum','Sab','Min']}
+  saveErr:'Gagal menyimpan. Cek koneksi lalu coba lagi.',cheers:['Mantap!','Keren!','Hebat!','Lanjut!','Jago!','Asyik! 💥'],
+  partyTitle:(n)=>`Hebat, ${n}!`,partyText:'Semua tugas hari ini beres. Sampai besok!',partyBtn:'Yeay! 🎉',days:['Sen','Sel','Rab','Kam','Jum','Sab','Min']}
 };
 const S={lang:'id',mode:'kid',kid:'danesh',unlocked:false,tasks:[],checks:{},settings:{pin:'1234',reward:10000},db:null,readOnly:false,pendingDel:null};
 try{const l=localStorage.getItem('lang');if(l==='en'||l==='id')S.lang=l;const k=localStorage.getItem('kid');if(k)S.kid=k}catch(e){}
@@ -299,7 +322,10 @@ function render(){
   const keep={},focusId=document.activeElement&&document.activeElement.id;
   document.querySelectorAll('#view input, #view select').forEach(el=>{if(el.id)keep[el.id]=el.value});
   const prevMode=render._mode;render._mode=S.mode+S.unlocked;
-  $('view').innerHTML=S.mode==='kid'?renderKid():renderParent();
+  const html=S.mode==='kid'?renderKid():renderParent();
+  if(prevMode===render._mode&&html===render._html)return;
+  render._html=html;
+  $('view').innerHTML=html;
   if(prevMode===render._mode){for(const id in keep){const el=$(id);if(el)el.value=keep[id]}
     if($('fRepeat')&&$('dateField'))$('dateField').hidden=$('fRepeat').value!=='once';
     if(focusId&&$(focusId))try{$(focusId).focus()}catch(e){}}
@@ -320,7 +346,9 @@ function bind(){
     S.checks[key]={date:today,kid:S.kid,done:dm};
     render();
     const after=dayStatus(S.kid,today);
-    if(after.total&&after.done===after.total&&before.done<before.total)confetti();
+    growRing(before,after);
+    if(dm[id])celebrate(id);
+    if(after.total&&after.done===after.total&&before.done<before.total)setTimeout(()=>{confetti();party()},450);
     write('checks/'+key,()=>S.db.doc('checks/'+key).set({date:today,kid:S.kid,done:dm,updatedAt:Date.now()}));
   });
   const pf=$('pinForm');
@@ -351,14 +379,47 @@ $('lang-id').onclick=()=>{S.lang='id';try{localStorage.setItem('lang','id')}catc
 $('mode-kid').onclick=()=>{S.mode='kid';render()};
 $('mode-parent').onclick=()=>{S.mode='parent';render()};
 
+// celebrations
+const calm=()=>matchMedia('(prefers-reduced-motion: reduce)').matches;
+function growRing(before,after){
+  const fg=document.querySelector('#view .ring .fg');if(!fg||!before.total)return;
+  const c=2*Math.PI*26;fg.style.transition='none';fg.style.strokeDashoffset=c*(1-before.done/before.total);
+  fg.getBoundingClientRect();fg.style.transition='';fg.style.strokeDashoffset=c*(1-after.done/after.total);
+  if(after.total&&after.done===after.total)fg.closest('.ring').classList.add('full');
+}
+function celebrate(id){
+  const b=document.querySelector(`#view [data-task="${id}"]`);if(!b)return;
+  b.classList.add('pop');const off=e=>{if(e.animationName==='glow'){b.classList.remove('pop');b.removeEventListener('animationend',off)}};b.addEventListener('animationend',off);
+  try{navigator.vibrate&&navigator.vibrate(25)}catch(e){}
+  if(calm())return;
+  const r=b.querySelector('.box').getBoundingClientRect(),cx=r.left+r.width/2,cy=r.top+r.height/2,em=['⭐','✨','🌟','💫'];
+  for(let i=0;i<8;i++){
+    const s=document.createElement('span'),a=i/8*Math.PI*2+Math.random()*.6,d=38+Math.random()*30;
+    s.className='spark';s.textContent=em[i%4];s.style.left=cx+'px';s.style.top=cy+'px';
+    s.style.setProperty('--dx',Math.cos(a)*d+'px');s.style.setProperty('--dy',Math.sin(a)*d+'px');
+    document.body.appendChild(s);s.addEventListener('animationend',()=>s.remove());
+  }
+  const br=b.getBoundingClientRect(),w=t().cheers,ch=document.createElement('span');
+  ch.className='cheer';ch.textContent=w[Math.floor(Math.random()*w.length)];
+  ch.style.left=Math.min(Math.max(br.left+br.width*.62,70),innerWidth-70)+'px';ch.style.top=(br.top-8)+'px';
+  document.body.appendChild(ch);ch.addEventListener('animationend',()=>ch.remove());
+}
+function party(){
+  const k=KIDS.find(x=>x.id===S.kid),el=$('party');
+  $('partyTitle').textContent=t().partyTitle(k?k.name:'');$('partyText').textContent=t().partyText;$('partyBtn').textContent=t().partyBtn;
+  el.hidden=false;try{$('partyBtn').focus({preventScroll:true})}catch(e){}
+  clearTimeout(party._t);party._t=setTimeout(()=>el.hidden=true,6000);
+}
+$('party').onclick=()=>{$('party').hidden=true;clearTimeout(party._t)};
+
 // confetti
 function confetti(){
   if(matchMedia('(prefers-reduced-motion: reduce)').matches)return;
   const c=$('fx'),x=c.getContext('2d');c.hidden=false;c.width=innerWidth;c.height=innerHeight;
   const cols=['#2f6fe4','#ffb21e','#1f9d63','#e0662f','#d1495b'];
-  const ps=[...Array(120)].map(()=>({x:c.width/2,y:c.height/3,vx:(Math.random()-.5)*12,vy:Math.random()*-12-3,s:Math.random()*7+4,c:cols[Math.floor(Math.random()*5)],r:Math.random()*6}));
+  const ps=[...Array(180)].map(()=>({x:c.width/2,y:c.height/3,vx:(Math.random()-.5)*12,vy:Math.random()*-12-3,s:Math.random()*7+4,c:cols[Math.floor(Math.random()*5)],r:Math.random()*6}));
   let f=0;(function step(){x.clearRect(0,0,c.width,c.height);ps.forEach(p=>{p.vy+=.35;p.x+=p.vx;p.y+=p.vy;p.r+=.1;x.save();x.translate(p.x,p.y);x.rotate(p.r);x.fillStyle=p.c;x.fillRect(-p.s/2,-p.s/2,p.s,p.s*.6);x.restore()});
-    if(++f<110)requestAnimationFrame(step);else{x.clearRect(0,0,c.width,c.height);c.hidden=true}})();
+    if(++f<150)requestAnimationFrame(step);else{x.clearRect(0,0,c.width,c.height);c.hidden=true}})();
 }
 
 render();
